@@ -1,0 +1,31 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "fittrack-454a8",
+          "appId": "1:957974136764:android:8c2e466b87ec66179d8db9",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "fittrack-454a8",
+          "configurations": {
+            "android": "1:957974136764:android:8c2e466b87ec66179d8db9",
+            "ios": "1:957974136764:ios:3e797bfc224cb8ce9d8db9",
+            "macos": "1:957974136764:ios:3e797bfc224cb8ce9d8db9",
+            "web": "1:957974136764:web:632f793f78735d9c9d8db9",
+            "windows": "1:957974136764:web:24a4ee8c0d7752809d8db9"
+          }
+        }
+      }
+    }
+  }
+}

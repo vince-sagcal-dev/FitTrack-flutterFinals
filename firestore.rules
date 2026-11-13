@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owns(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read, create, update, delete: if owns(userId);
+
+      match /foods/{foodId} {
+        allow read, delete: if owns(userId);
+        allow create, update: if owns(userId)
+          && request.resource.data.keys().hasAll([
+            'foodName', 'calories', 'protein', 'carbohydrates', 'fat',
+            'servingSize', 'mealType', 'foodDate', 'imageUrl'
+          ])
+          && request.resource.data.keys().hasOnly([
+            'foodName', 'calories', 'protein', 'carbohydrates', 'fat',
+            'servingSize', 'mealType', 'foodDate', 'imageUrl'
+          ])
+          && request.resource.data.foodName is string
+          && request.resource.data.calories is number
+          && request.resource.data.calories > 0
+          && request.resource.data.protein is number
+          && request.resource.data.carbohydrates is number
+          && request.resource.data.fat is number
+          && request.resource.data.servingSize is string
+          && request.resource.data.mealType in [
+            'Breakfast', 'Lunch', 'Dinner', 'Snack'
+          ]
+          && request.resource.data.foodDate is timestamp
+          && (
+            request.resource.data.imageUrl == null
+            || request.resource.data.imageUrl is string
+          );
+      }
+    }
+  }
+}

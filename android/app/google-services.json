@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "957974136764",
+    "project_id": "fittrack-454a8",
+    "storage_bucket": "fittrack-454a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:957974136764:android:8c2e466b87ec66179d8db9",
+        "android_client_info": {
+          "package_name": "com.example.food_calorie_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8qOH--7KQABeFziZIaU4sF5cOEU5ye2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
