@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FitTracker — Food Calorie Tracker
 
 FitTracker is a Flutter calorie-tracking app with Firebase Authentication,
@@ -72,3 +73,6 @@ On Windows, connect a camera and allow desktop apps to access it in Windows
 available when no camera is connected. Fully stop any existing Windows app
 process before `flutter run -d windows` so native camera plugin changes are
 rebuilt and registered.
+=======
+# FitTrack-flutterFinals
+>>>>>>> b164cc7f6aef9ed7848ae8a8ed2d884cdff419a1
