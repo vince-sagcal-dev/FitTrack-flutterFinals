@@ -25,4 +25,9 @@ abstract final class Validators {
     if (number == null || number < 0) return '$label cannot be negative.';
     return null;
   }
+
+  static String? requiredNonNegativeNumber(
+    String? value, {
+    String label = 'Value',
+  }) => required(value, label: label) ?? nonNegativeNumber(value, label: label);
 }

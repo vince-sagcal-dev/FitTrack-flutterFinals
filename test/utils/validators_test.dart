@@ -14,5 +14,24 @@ void main() {
       expect(Validators.positiveNumber('0', label: 'Calories'), isNotNull);
       expect(Validators.positiveNumber('210.5'), isNull);
     });
+
+    test('requires non-negative numeric values for food macros', () {
+      expect(
+        Validators.requiredNonNegativeNumber('', label: 'Protein'),
+        isNotNull,
+      );
+      expect(
+        Validators.requiredNonNegativeNumber('-1', label: 'Protein'),
+        isNotNull,
+      );
+      expect(
+        Validators.requiredNonNegativeNumber('0', label: 'Protein'),
+        isNull,
+      );
+      expect(
+        Validators.requiredNonNegativeNumber('12.5', label: 'Protein'),
+        isNull,
+      );
+    });
   });
 }

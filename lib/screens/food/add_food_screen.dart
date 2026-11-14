@@ -185,6 +185,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
           DropdownButtonFormField<String>(
             initialValue: _meal,
             decoration: const InputDecoration(labelText: 'Meal'),
+            validator: (value) => Validators.required(value, label: 'Meal'),
             items: AppConstants.mealTypes
                 .map((meal) => DropdownMenuItem(value: meal, child: Text(meal)))
                 .toList(),
@@ -207,10 +208,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
-            'Macros (optional)',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
+          const Text('Macros', style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -236,9 +234,8 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       TextFormField(
         controller: controller,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        validator: (value) => value == null || value.isEmpty
-            ? null
-            : Validators.nonNegativeNumber(value, label: label),
+        validator: (value) =>
+            Validators.requiredNonNegativeNumber(value, label: label),
         decoration: InputDecoration(labelText: label),
       );
 }

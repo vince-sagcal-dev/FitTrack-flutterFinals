@@ -30,8 +30,8 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
             )
           : await _picker.pickImage(
               source: source,
-              imageQuality: 85,
-              maxWidth: 1600,
+              imageQuality: 80,
+              maxWidth: 1280,
             );
       if (picked == null || !mounted) return;
       setState(() => _analyzing = true);
@@ -52,12 +52,19 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Food analysis failed: $error')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(_analysisErrorMessage(error))));
     } finally {
       if (mounted) setState(() => _analyzing = false);
     }
+  }
+
+  String _analysisErrorMessage(Object error) {
+    if (error.toString().contains('App attestation failed')) {
+      return 'App Check rejected this Windows app. Register its debug token '
+          'in Firebase Console under App Check, then restart the app.';
+    }
+    return 'Food analysis failed: $error';
   }
 
   @override

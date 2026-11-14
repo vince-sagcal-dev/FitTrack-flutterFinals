@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kDebugMode, kIsWeb, TargetPlatform;
 import 'package:material_ui/material_ui.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
+
 import 'firebase_options.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/dashboard_screen.dart';
@@ -33,6 +33,11 @@ Future<void> main() async {
       debugPrint(
         'Windows App Check token refresh failed '
         '(${error.code}): ${error.message}',
+      );
+      debugPrint(
+        'For HTTP 403, register the Windows debug token in Firebase Console '
+        'under App Check for the Firebase app configured for Windows, then '
+        'restart the app.',
       );
     }
   }

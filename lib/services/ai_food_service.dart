@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -6,19 +7,28 @@ import 'package:image_picker/image_picker.dart';
 
 import '../models/food_model.dart';
 
-class AiFoodService {
-  AiFoodService({GenerativeModel? model})
-    : _model =
-          model ??
-          FirebaseAI.googleAI().generativeModel(
-            model: 'gemini-3.8-flash',
-            generationConfig: GenerationConfig(
-              responseMimeType: 'application/json',
-              temperature: 0.2,
-            ),
-          );
+typedef AiContentGenerator = Future<GenerateContentResponse> Function(
+  Iterable<Content> prompt,
+);
 
-  final GenerativeModel _model;
+class AiFoodService {
+  AiFoodService({GenerativeModel? model, AiContentGenerator? contentGenerator})
+    : _contentGenerator =
+          contentGenerator ??
+          (model ??
+                  FirebaseAI.googleAI().generativeModel(
+                    model: 'gemini-3.8-flash',
+                    generationConfig: GenerationConfig(
+                      responseMimeType: 'application/json',
+                      temperature: 0.2,
+                    ),
+                  ))
+              .generateContent;
+
+  final AiContentGenerator _contentGenerator;
+
+  static const _maxAttempts = 2;
+  static const _requestTimeout = Duration(seconds: 20);
 
   Future<FoodModel> analyzeImage(XFile image) async {
     final bytes = await image.readAsBytes();
@@ -29,7 +39,7 @@ class AiFoodService {
     Uint8List bytes, {
     String mimeType = 'image/jpeg',
   }) async {
-    final response = await _model.generateContent([
+    final response = await _generateContent([
       Content.multi([
         TextPart(
           'Identify the visible food and estimate nutrition for the portion '
@@ -65,6 +75,30 @@ class AiFoodService {
       mealType: _mealType(decoded['mealType']?.toString()),
       foodDate: DateTime.now(),
     );
+  }
+
+  Future<GenerateContentResponse> _generateContent(
+    Iterable<Content> prompt,
+  ) async {
+    for (var attempt = 0; attempt < _maxAttempts; attempt++) {
+      try {
+        return await _contentGenerator(prompt).timeout(_requestTimeout);
+      } on TimeoutException {
+        throw FirebaseAIException(
+          'Food analysis timed out. Check your connection and try again.',
+        );
+      } on FirebaseAIException catch (error) {
+        if (!error.message.contains('Server Error [503]')) rethrow;
+        if (attempt == _maxAttempts - 1) {
+          throw FirebaseAIException(
+            'Food analysis is temporarily unavailable. Please try again in a moment.',
+          );
+        }
+        await Future<void>.delayed(Duration(seconds: 1 << attempt));
+      }
+    }
+
+    throw StateError('Food analysis request ended without a response.');
   }
 
   double _number(Object? value) =>
