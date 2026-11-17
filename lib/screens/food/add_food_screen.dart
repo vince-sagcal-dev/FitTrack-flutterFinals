@@ -1,27 +1,17 @@
-import 'dart:typed_data';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/food_model.dart';
 import '../../services/firestore_service.dart';
-import '../../services/storage_service.dart';
 import '../../utils/app_constants.dart';
 import '../../utils/validators.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 
 class AddFoodScreen extends StatefulWidget {
-  const AddFoodScreen({
-    this.initialFood,
-    this.imageBytes,
-    this.imageMimeType = 'image/jpeg',
-    super.key,
-  });
+  const AddFoodScreen({this.initialFood, super.key});
 
   final FoodModel? initialFood;
-  final Uint8List? imageBytes;
-  final String imageMimeType;
 
   @override
   State<AddFoodScreen> createState() => _AddFoodScreenState();
@@ -88,7 +78,6 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       );
       return;
     }
-    final messenger = ScaffoldMessenger.of(context);
     setState(() => _saving = true);
     try {
       final food = FoodModel(
@@ -102,33 +91,10 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         mealType: _meal,
         foodDate: _date,
       );
-      final id = await FirestoreService().addFood(user.uid, food);
-      if (widget.imageBytes != null) {
-        try {
-          final imageUrl = await StorageService().uploadFoodImage(
-            user.uid,
-            id,
-            widget.imageBytes!,
-            mimeType: widget.imageMimeType,
-          );
-          await FirestoreService().updateFood(
-            user.uid,
-            food.copyWith(id: id, imageUrl: imageUrl),
-          );
-        } catch (error) {
-          if (!mounted) return;
-          messenger.showSnackBar(
-            SnackBar(
-              content: Text('Food saved, but photo upload failed: $error'),
-            ),
-          );
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          return;
-        }
-      }
+      await FirestoreService().addFood(user.uid, food);
       if (!mounted) return;
       Navigator.of(context).popUntil((route) => route.isFirst);
-      messenger.showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Food added to your diary.')),
       );
     } catch (error) {
@@ -148,17 +114,6 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          if (widget.imageBytes != null) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: Image.memory(
-                widget.imageBytes!,
-                height: 170,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
           CustomTextField(
             controller: _name,
             label: 'Food name',

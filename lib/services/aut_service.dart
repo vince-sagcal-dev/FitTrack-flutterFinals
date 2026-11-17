@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   AuthService({FirebaseAuth? auth, FirebaseFirestore? firestore})
@@ -8,6 +10,7 @@ class AuthService {
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
+  static Future<void>? _googleSignInInitialization;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
   User? get currentUser => _auth.currentUser;
@@ -47,6 +50,63 @@ class AuthService {
     required String password,
   }) =>
       _auth.signInWithEmailAndPassword(email: email.trim(), password: password);
+
+  Future<UserCredential> signInWithGoogle() async {
+    final UserCredential credential;
+    if (kIsWeb) {
+      credential = await _auth.signInWithPopup(GoogleAuthProvider());
+    } else {
+      final googleSignIn = GoogleSignIn.instance;
+      final initialization = _googleSignInInitialization ??= googleSignIn
+          .initialize();
+      try {
+        await initialization;
+      } catch (_) {
+        _googleSignInInitialization = null;
+        rethrow;
+      }
+      final googleUser = await googleSignIn.authenticate();
+      final idToken = googleUser.authentication.idToken;
+      if (idToken == null) {
+        throw FirebaseAuthException(
+          code: 'missing-google-id-token',
+          message: 'Google did not provide an authentication token.',
+        );
+      }
+      credential = await _auth.signInWithCredential(
+        GoogleAuthProvider.credential(idToken: idToken),
+      );
+    }
+
+    final user = credential.user;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'google-user-missing',
+        message: 'Google sign-in succeeded without an account. Please retry.',
+      );
+    }
+
+    final profile = _db.collection('users').doc(user.uid);
+    final existingProfile = await profile.get();
+    if (existingProfile.exists) {
+      await profile.set({
+        'fullName': user.displayName ?? '',
+        'email': user.email ?? '',
+        'photoUrl': user.photoURL,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } else {
+      await profile.set({
+        'fullName': user.displayName ?? '',
+        'email': user.email ?? '',
+        'photoUrl': user.photoURL,
+        'dailyCalorieGoal': 2000,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    }
+    return credential;
+  }
 
   Future<void> logout() => _auth.signOut();
 

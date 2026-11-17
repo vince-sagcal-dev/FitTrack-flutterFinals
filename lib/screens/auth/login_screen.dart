@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:material_ui/material_ui.dart';
 
 import '../../utils/app_colors.dart';
 import '../../utils/validators.dart';
+import '../../services/aut_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 import 'forgot_password_screen.dart';
@@ -22,11 +25,38 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
   bool _hidePassword = true;
 
+  bool get _googleSignInAvailable =>
+      kIsWeb ||
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.macOS;
+
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _loading = true);
+    try {
+      await AuthService().signInWithGoogle();
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message ?? 'Could not sign in with Google.'),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Google sign-in failed: $error')));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   Future<void> _signIn() async {
@@ -126,6 +156,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: _signIn,
                     isLoading: _loading,
                   ),
+                  if (_googleSignInAvailable) ...[
+                    const SizedBox(height: 18),
+                    const _OrDivider(),
+                    const SizedBox(height: 18),
+                    OutlinedButton.icon(
+                      onPressed: _loading ? null : _signInWithGoogle,
+                      icon: const Icon(Icons.account_circle_outlined),
+                      label: const Text('Continue with Google'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () => Navigator.of(context).push(
@@ -142,6 +185,22 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     ),
+  );
+}
+
+class _OrDivider extends StatelessWidget {
+  const _OrDivider();
+
+  @override
+  Widget build(BuildContext context) => const Row(
+    children: [
+      Expanded(child: Divider()),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 14),
+        child: Text('OR', style: TextStyle(color: AppColors.muted)),
+      ),
+      Expanded(child: Divider()),
+    ],
   );
 }
 

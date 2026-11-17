@@ -31,4 +31,25 @@ class ProfileService {
     await _auth.currentUser?.updateDisplayName(profile.fullName);
     await _auth.currentUser?.updatePhotoURL(profile.photoUrl);
   }
+
+  Future<void> saveCaloriePlan({
+    required String uid,
+    required int dailyCalorieGoal,
+    required int age,
+    required double weightKg,
+    required double heightCm,
+    required String sex,
+    required String activityLevel,
+    double? bodyFatPercent,
+  }) => _profile(uid).set({
+    'dailyCalorieGoal': dailyCalorieGoal,
+    'age': age,
+    'weightKg': weightKg,
+    'heightCm': heightCm,
+    'sex': sex,
+    'activityLevel': activityLevel,
+    if (bodyFatPercent == null) 'bodyFatPercent': FieldValue.delete(),
+    'bodyFatPercent': ?bodyFatPercent,
+    'updatedAt': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
 }

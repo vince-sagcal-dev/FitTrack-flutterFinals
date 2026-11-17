@@ -90,7 +90,7 @@ class SettingsScreen extends StatelessWidget {
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text('About FitTracker'),
-            subtitle: Text('Food logging and estimated nutrition tracking'),
+            subtitle: Text('Food logging and estimated calorie goals'),
           ),
           const ListTile(
             leading: Icon(Icons.health_and_safety_outlined),

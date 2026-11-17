@@ -12,8 +12,8 @@ import '../../widgets/calorie_progress.dart';
 import '../../widgets/food_card.dart';
 import '../food/add_food_screen.dart';
 import '../food/food_history_screen.dart';
-import '../food/food_scanner_screen.dart';
 import '../food/edit_food_screen.dart';
+import '../calories/calorie_calculator_screen.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_screen.dart';
 
@@ -43,7 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             _dashboard(user.uid, user.displayName),
             FoodHistoryScreen(foods: _foods),
-            const FoodScannerScreen(),
+            CalorieCalculatorScreen(uid: user.uid, profiles: _profiles),
             ProfileScreen(
               profiles: _profiles,
               onSettings: () => Navigator.of(context).push(
@@ -55,17 +55,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
-        onDestinationSelected: (index) {
-          if (index == 2) {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const FoodScannerScreen(),
-              ),
-            );
-            return;
-          }
-          setState(() => _tab = index);
-        },
+        onDestinationSelected: (index) => setState(() => _tab = index),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -77,8 +67,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'Diary',
           ),
           NavigationDestination(
-            icon: Icon(Icons.center_focus_weak_outlined),
-            label: 'Scan',
+            icon: Icon(Icons.calculate_outlined),
+            selectedIcon: Icon(Icons.calculate),
+            label: 'Goals',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),
@@ -215,7 +206,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onAdd: () {
                           Navigator.of(context).push(
                             MaterialPageRoute<void>(
-                              builder: (_) => const FoodScannerScreen(),
+                              builder: (_) => const AddFoodScreen(),
                             ),
                           );
                         },
@@ -312,13 +303,13 @@ class _EmptyMeals extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         const Text(
-          'Add your first meal to start tracking.',
+          'Add your first meal to start tracking your intake.',
           style: TextStyle(color: AppColors.muted),
         ),
         TextButton.icon(
           onPressed: onAdd,
-          icon: const Icon(Icons.camera_alt_outlined),
-          label: const Text('Scan a meal'),
+          icon: const Icon(Icons.add),
+          label: const Text('Log a meal'),
         ),
       ],
     ),
