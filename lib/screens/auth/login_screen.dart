@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../utils/app_colors.dart';
@@ -49,6 +50,14 @@ class _LoginScreenState extends State<LoginScreen> {
           content: Text(error.message ?? 'Could not sign in with Google.'),
         ),
       );
+    } on GoogleSignInException catch (error) {
+      if (!mounted) return;
+      final message = error.code == GoogleSignInExceptionCode.canceled
+          ? 'Google sign-in was canceled. If you selected an account, check that this Android app\'s SHA-1 fingerprint is registered in Firebase and that google-services.json is up to date.'
+          : error.description ?? 'Could not sign in with Google.';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(

@@ -21,12 +21,19 @@ This project currently uses the Firebase project configured in
 
 1. In Firebase Console, enable **Authentication → Email/Password**.
 2. To enable Google sign-in, also enable **Authentication → Google** and
-   configure the Google Sign-In client for each supported platform. Follow the
-   platform setup in the
-   [google_sign_in package guide](https://pub.dev/packages/google_sign_in#platform-integration)
-   and add the required Android SHA fingerprints / iOS URL scheme. The Windows
-   desktop Firebase Auth plugin does not support Google provider sign-in, so
-   Windows continues to use email/password sign-in.
+   configure the Google Sign-In client for each supported platform. In Firebase
+   project settings, add the Android app's debug and release SHA-1 fingerprints
+   (and SHA-256 fingerprints if available), then download the refreshed
+   `google-services.json` into `android/app/`. It must include the Web OAuth
+   client entry (`client_type: 3`); Android reads that as its server client ID.
+   A canceled error after choosing an account can indicate a missing or
+   mismatched SHA fingerprint or Android package name. For iOS, keep
+   `GoogleService-Info.plist` in `ios/Runner/`; its reversed client ID is
+   configured as a URL scheme in `ios/Runner/Info.plist`. Follow the platform
+   setup in the [google_sign_in package
+   guide](https://pub.dev/packages/google_sign_in#platform-integration). The
+   Windows desktop Firebase Auth plugin does not support Google provider
+   sign-in, so Windows continues to use email/password sign-in.
 3. Create a **Cloud Firestore** database.
 4. Install the Firebase CLI, sign in, and select the intended Firebase project.
    Deploy the included owner-only rules:

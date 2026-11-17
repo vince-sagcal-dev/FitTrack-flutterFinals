@@ -73,7 +73,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           CustomTextField(
             controller: _new,
             label: 'New password',
-            validator: Validators.password,
+            validator: (value) {
+              final passwordError = Validators.password(value);
+              if (passwordError != null) return passwordError;
+              if (value == _current.text) {
+                return 'New password must be different from your current password.';
+              }
+              return null;
+            },
             obscureText: true,
           ),
           const SizedBox(height: 14),

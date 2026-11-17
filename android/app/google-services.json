@@ -12,7 +12,12 @@
           "package_name": "com.example.food_calorie_tracker"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "957974136764-cfqui2743tfjfiomv0hikt8dqgim3ben.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD8qOH--7KQABeFziZIaU4sF5cOEU5ye2A"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "957974136764-cfqui2743tfjfiomv0hikt8dqgim3ben.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "957974136764-f40la2ol0jkne7km8kkun76dod7mqipb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.foodCalorieTracker"
+              }
+            }
+          ]
         }
       }
     }
